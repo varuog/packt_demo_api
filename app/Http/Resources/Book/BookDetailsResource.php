@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Book;
 
+use App\Http\Resources\Author\AuthorDetailsResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class BookDetailsResource extends JsonResource
@@ -14,6 +15,17 @@ class BookDetailsResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'title' => $this->title,
+            'description' => $this->title,
+            'pages' => $this->pages,
+            'publication_date' => $this->publication_date,
+            'release_year' => $this->release_year,
+            'isbn' => $this->release_year,
+            'packt_id' => $this->packt_id,
+            'product_type' => $this->product_type,
+            'url' => $this->url,
+            'authors' => AuthorDetailsResource::collection($this->authors)
+        ];
     }
 }

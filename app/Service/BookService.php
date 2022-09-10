@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Models\Book;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class BookService
 {
@@ -25,10 +26,12 @@ class BookService
     const SORT_FIELD_POPULAR = 'popular';
 
     protected $httpService;
+    protected $authorService;
 
 
-    public function __construct()
+    public function __construct(AuthorService $authorService)
     {
+        $this->authorService = $authorService;
     }
 
     /**
@@ -38,9 +41,10 @@ class BookService
      * @param array $sort array valid key values array static::SORT_FIELD_*  and valid values are 'ASC' and 'DESC    
      * @param array $perPage null|integer if null all data fetched else per page item will be sent as per param
      */
-    public function fetchAll($filter = [], $sort = [], $perPage = null)
+    public function fetchAll(array $filter = [], array $sort = [], $perPage = null)
     {
         $bookQuery = Book::query();
+        $bookQuery->with(['authors', 'tags']);
         //dd($filter);
         /*
         * Handles filter
@@ -105,7 +109,7 @@ class BookService
     public function fetch($bookId)
     {
         $bookQuery = Book::findOrFail($bookId);
-        $bookQuery->with('authors', 'category', 'expertise');
+        $bookQuery->with('authors', 'tags');
 
         return $bookQuery->first();
     }
@@ -132,17 +136,17 @@ class BookService
 
         return [
             [
-                'filter' =>  static::FILTER_PRODUCT_TYPE, 
+                'filter' =>  static::FILTER_PRODUCT_TYPE,
                 'displayName' => __('Product Type'),
                 'data' => $productTypes,
             ],
             [
-                'filter' =>  static::FILTER_PUBLISH_YEAR, 
+                'filter' =>  static::FILTER_PUBLISH_YEAR,
                 'displayName' => __('Publication Date'),
                 'data' => $publicationDates,
             ],
             [
-                'filter' =>  static::FILTER_RELEASE_YEAR, 
+                'filter' =>  static::FILTER_RELEASE_YEAR,
                 'displayName' => __('Release Year'),
                 'data' => $releaseDates,
             ],
@@ -168,5 +172,53 @@ class BookService
             //     ]
             // ],
         ];
+    }
+
+    /**
+     * Create bulk books
+     * @param array $books array of book data from API
+     * @return array Author array of book model
+     */
+    public function bulkAdd(array $bookData)
+    {
+        // Log::debug($books);
+
+            DB::transaction(function () use ($bookData) {
+                $book = Book::updateOrCreate(
+                    [
+                        'packt_id' => $bookData['id'],
+                        'isbn' => $bookData['isbn13'],
+                    ]
+                    ,
+                    [
+                        'title' => $bookData['title'],
+                        'publication_date' => fake()->date('Y'),
+                        'product_type' => fake()->randomElement(['ebook', 'print']),
+                        'description' => fake()->text(),
+                        'release_year' => fake()->date('Y'),
+                        'pages' => fake()->numberBetween(50, 500),
+                        'url' => fake()->url(),
+
+
+                    ],
+                );
+
+                $authors = $this->authorService->bulkAdd($bookData['authors']);
+                $book->authors()->saveMany($authors);
+                if($bookData['categories']) {
+                    $categories = is_string($bookData['categories']) ? [$bookData['categories']] : $bookData['categories'];
+                    $book->attachTags($categories, Book::CATEGORY_TYPE_CATEGORY);
+                }
+                if($bookData['concept']) {
+                    $concept = is_string($bookData['concept']) ? [$bookData['concept']] : $bookData['concept'];
+                    $book->attachTags($concept, Book::CATEGORY_TYPE_CONCEPT);
+                }
+                if($bookData['language']) {
+                    $language = is_string($bookData['language']) ? [$bookData['language']] : $bookData['language'];
+                    $book->attachTags($language, Book::CATEGORY_TYPE_LANGUAGE);
+                }
+                
+            });
+        
     }
 }

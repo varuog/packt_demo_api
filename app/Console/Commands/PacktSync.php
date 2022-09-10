@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\BookSyncJob;
 use App\Service\PacktService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class PacktSync extends Command
 {
@@ -19,9 +21,9 @@ class PacktSync extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Packt API Sync';
 
-    protected $packtService;
+    protected PacktService $packtService;
 
     public function __construct(PacktService $packtService)
     {
@@ -36,8 +38,16 @@ class PacktSync extends Command
      */
     public function handle()
     {
-        $books = $this->packtService->fetchAll();
-        dd($books);
+        $booksData = $this->packtService->fetchAll();
+        // dd($booksData['products']);
+        if(isset($booksData['products']) && is_array($booksData['products'])) {
+            foreach($booksData['products'] as $bookData) {
+                dispatch(new BookSyncJob($bookData));
+            }
+        } else {
+            Log::error('Packt API error');
+        }
+        
 
         return 0;
     }

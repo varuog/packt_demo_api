@@ -19,16 +19,19 @@ class PacktService
     }
 
     /**
-     * @param  int  $limit default 100
      * @param  int  $page default 1
+     * @param  int  $limit default 10000
      */
-    public function fetchAll($page = 1, $limit = 100)
+    public function fetchAll($page=1, $limit=1000)
     {
-        $productListApiUrl = sprintf('%s/api/v1/products', config('services.packt.url'));
+        $productListApiUrl = sprintf('%s/api/v1/products?', config('services.packt.url'));
         // dd($productListApiUrl);
-        $productsReq = $this->httpService->get($productListApiUrl);
+        $productsReq = $this->httpService->get($productListApiUrl, [
+            'page' => $page,
+            'limit' => $limit,
+        ]);
         $products = $productsReq->json();
-
+        // dd($products);
         return $products;
     }
 }
