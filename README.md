@@ -15,6 +15,7 @@ Postman API collection resource and Documentation: https://documenter.getpostman
 Change enviorment variables of postman if needed
 
 # Frontend Setup
+Repo Link https://github.com/varuog/packt_demo_ui
 - clone the git repo
 - run ‘npm i’
 - run ‘npm run start’
