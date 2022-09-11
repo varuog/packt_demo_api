@@ -4,6 +4,7 @@
 - copy .env.example file to .env
 - configure DB
 - run php artisan:migrate -seed to generate dummy database
+- run 'php artisan:test' to run feature test cases
 
 # Sync data from packt API
 Run 'php artisan queue:listen'
