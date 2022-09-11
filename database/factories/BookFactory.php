@@ -31,16 +31,17 @@ class BookFactory extends Factory
         ];
     }
 
-    public function configure() {
-        return $this->afterCreating(function($book) {
-            $language = Tag::where('type', Book::CATEGORY_TYPE_LANGUAGE)->inRandomOrder()->first();
-            $concept = Tag::where('type', Book::CATEGORY_TYPE_CONCEPT)->inRandomOrder()->first();
-            $category = Tag::where('type', Book::CATEGORY_TYPE_CATEGORY)->inRandomOrder()->first();
-            //dd($language);
-            $book->attachTag($language);
-            $book->attachTag($concept);
-            $book->attachTag($category);
+    //Not using for test
+    // public function configure() {
+        // return $this->afterCreating(function($book) {
+        //     $language = Tag::where('type', Book::CATEGORY_TYPE_LANGUAGE)->inRandomOrder()->first();
+        //     $concept = Tag::where('type', Book::CATEGORY_TYPE_CONCEPT)->inRandomOrder()->first();
+        //     $category = Tag::where('type', Book::CATEGORY_TYPE_CATEGORY)->inRandomOrder()->first();
+        //     //dd($language);
+        //     $book->attachTag($language);
+        //     $book->attachTag($concept);
+        //     $book->attachTag($category);
 
-        });
-    }
+        // });
+    // }
 }
