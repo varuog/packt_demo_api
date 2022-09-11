@@ -33,6 +33,8 @@ class BookController extends Controller
 
         $books = $this->bookService->fetchAll($filter, $sort, $perPage);
 
+        //throw new \Exception('Error');
+
         return response()->json([
             'status' => 200,
             'data'=> ($view == 'list') ? BookBookListingResource::collection($books->items()) 

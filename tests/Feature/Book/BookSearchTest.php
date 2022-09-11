@@ -15,7 +15,7 @@ class BookSearchTest extends TestCase
      */
     public function test_example()
     {
-        $response = $this->get('/');
+        $response = $this->get('/api/book');
 
         $response->assertStatus(200);
     }

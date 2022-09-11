@@ -16,6 +16,7 @@ class BookListThumbResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'id' => $this->id,
             'title' => $this->title,
             'description' => $this->title,
             'pages' => $this->pages,

@@ -3,6 +3,8 @@
 namespace App\Service;
 
 use App\Models\Book;
+use App\Models\Tag;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -23,16 +25,20 @@ class BookService
     const SORT_ORDER_ASC = 'ASC';
 
     const SORT_FIELD_PUBLISH_YEAR = 'publish_year';
-    const SORT_FIELD_POPULAR = 'popular';
+    // const SORT_FIELD_POPULAR = 'popular';
+    const SORT_FIELD_RELEASE_YEARE = 'release_year';
 
     protected $httpService;
     protected $authorService;
+    protected $tagService;
 
-
-    public function __construct(AuthorService $authorService)
+    public function __construct(AuthorService $authorService, TagService $tagService)
     {
         $this->authorService = $authorService;
+        $this->tagService = $tagService;
+        //dd('ss');
     }
+
 
     /**
      * Fetch book list along with filters and sorting
@@ -87,9 +93,17 @@ class BookService
         /*
         * Handles sorting
         */
+        //dd($sort);
         foreach ($sort as $sortField => $sortOrder) {
-            if (in_array($sortField, [static::SORT_FIELD_PUBLISH_YEAR, static::SORT_FIELD_POPULAR])) {
-                $bookQuery->orderBy($sortField, $sortOrder);
+            if (in_array($sortField, [static::SORT_FIELD_PUBLISH_YEAR, static::SORT_FIELD_RELEASE_YEARE])) {
+                
+                if($sortField == static::SORT_FIELD_PUBLISH_YEAR) {
+                    $bookQuery->orderBy('publication_date', $sortOrder);
+                }
+                if($sortField == static::SORT_FIELD_RELEASE_YEARE) {
+                    $bookQuery->orderBy('release_year', $sortOrder);
+                }
+                
             }
         }
 
@@ -121,6 +135,8 @@ class BookService
      */
     public function fetchFilters()
     {
+        // $locale = App::currentLocale();
+
         $productTypes = Book::select('product_type AS name', DB::raw('COUNT("product_type") as total'))
             ->groupBy('product_type')
             ->get();
@@ -131,10 +147,20 @@ class BookService
             ->groupBy('release_year')
             ->get();
 
-        $categories = Book::withCount('tags');
+
+        $categories = $this->tagService->tagListCountByType(static::FILTER_CATEGORY);
+        $languages = $this->tagService->tagListCountByType(static::FILTER_LANGUAGE);
+        $concepts = $this->tagService->tagListCountByType(static::FILTER_CONCEPT);
+
+        // dd($categories);
         // dd($productTypes, $publicationDates, $releaseDates);
 
         return [
+            [
+                'filter' =>  static::FILTER_CATEGORY,
+                'displayName' => __('Category'),
+                'data' => $categories
+            ],
             [
                 'filter' =>  static::FILTER_PRODUCT_TYPE,
                 'displayName' => __('Product Type'),
@@ -150,27 +176,17 @@ class BookService
                 'displayName' => __('Release Year'),
                 'data' => $releaseDates,
             ],
-            // [
-            //     'filter' =>  static::FILTER_LANGUAGE, 
-            //     'displayName' => __('Language'),
-            //     'data' => [
+            [
+                'filter' =>  static::FILTER_LANGUAGE,
+                'displayName' => __('Language'),
+                'data' => $languages
+            ],
+            [
+                'filter' =>  static::FILTER_CONCEPT,
+                'displayName' => __('Concept'),
+                'data' => $concepts
+            ],
 
-            //     ]
-            // ],
-            // [
-            //     'filter' =>  static::FILTER_CONCEPT, 
-            //     'displayName' => __('Concept'),
-            //     'data' => [
-
-            //     ]
-            // ],
-            // [
-            //     'filter' =>  static::FILTER_CATEGORY, 
-            //     'displayName' => __('Category'),
-            //     'data' => [
-
-            //     ]
-            // ],
         ];
     }
 
@@ -183,42 +199,39 @@ class BookService
     {
         // Log::debug($books);
 
-            DB::transaction(function () use ($bookData) {
-                $book = Book::updateOrCreate(
-                    [
-                        'packt_id' => $bookData['id'],
-                        'isbn' => $bookData['isbn13'],
-                    ]
-                    ,
-                    [
-                        'title' => $bookData['title'],
-                        'publication_date' => fake()->date('Y'),
-                        'product_type' => fake()->randomElement(['ebook', 'print']),
-                        'description' => fake()->text(),
-                        'release_year' => fake()->date('Y'),
-                        'pages' => fake()->numberBetween(50, 500),
-                        'url' => fake()->url(),
+        DB::transaction(function () use ($bookData) {
+            $book = Book::updateOrCreate(
+                [
+                    'packt_id' => $bookData['id'],
+                    'isbn' => $bookData['isbn13'],
+                ],
+                [
+                    'title' => $bookData['title'],
+                    'publication_date' => fake()->date('Y'),
+                    'product_type' => fake()->randomElement(['ebook', 'print']),
+                    'description' => fake()->text(),
+                    'release_year' => fake()->date('Y'),
+                    'pages' => fake()->numberBetween(50, 500),
+                    'url' => fake()->url(),
 
 
-                    ],
-                );
+                ],
+            );
 
-                $authors = $this->authorService->bulkAdd($bookData['authors']);
-                $book->authors()->saveMany($authors);
-                if($bookData['categories']) {
-                    $categories = is_string($bookData['categories']) ? [$bookData['categories']] : $bookData['categories'];
-                    $book->attachTags($categories, Book::CATEGORY_TYPE_CATEGORY);
-                }
-                if($bookData['concept']) {
-                    $concept = is_string($bookData['concept']) ? [$bookData['concept']] : $bookData['concept'];
-                    $book->attachTags($concept, Book::CATEGORY_TYPE_CONCEPT);
-                }
-                if($bookData['language']) {
-                    $language = is_string($bookData['language']) ? [$bookData['language']] : $bookData['language'];
-                    $book->attachTags($language, Book::CATEGORY_TYPE_LANGUAGE);
-                }
-                
-            });
-        
+            $authors = $this->authorService->bulkAdd($bookData['authors']);
+            $book->authors()->saveMany($authors);
+            if ($bookData['categories']) {
+                $categories = is_string($bookData['categories']) ? [$bookData['categories']] : $bookData['categories'];
+                $book->attachTags($categories, Book::CATEGORY_TYPE_CATEGORY);
+            }
+            if ($bookData['concept']) {
+                $concept = is_string($bookData['concept']) ? [$bookData['concept']] : $bookData['concept'];
+                $book->attachTags($concept, Book::CATEGORY_TYPE_CONCEPT);
+            }
+            if ($bookData['language']) {
+                $language = is_string($bookData['language']) ? [$bookData['language']] : $bookData['language'];
+                $book->attachTags($language, Book::CATEGORY_TYPE_LANGUAGE);
+            }
+        });
     }
 }
