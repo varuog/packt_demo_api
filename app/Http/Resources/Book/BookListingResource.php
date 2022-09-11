@@ -22,7 +22,7 @@ class BookListingResource extends JsonResource
             'pages' => $this->pages,
             'publication_date' => $this->publication_date,
             'release_year' => $this->release_year,
-            'authors' => AuthorDetailsResource::collection($this->authors)
+            'authors' => AuthorDetailsResource::collection($this->authors),
         ];
     }
 }

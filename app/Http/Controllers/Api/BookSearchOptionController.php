@@ -8,14 +8,13 @@ use Illuminate\Http\Request;
 
 class BookSearchOptionController extends Controller
 {
-
     protected $bookService;
 
     public function __construct(BookService $bookService)
     {
         $this->bookService = $bookService;
     }
-    
+
     /**
      * Handle the incoming request.
      *
@@ -25,15 +24,16 @@ class BookSearchOptionController extends Controller
     public function __invoke(Request $request)
     {
         $filters = $this->bookService->fetchFilters();
+
         return response()->json([
             'status' => 200,
-            'data'=> [
-                'filters' => $filters
+            'data' => [
+                'filters' => $filters,
             ],
             'error' => [],
             'message' => __('Book filter option has been loaded sucessfuly'),
             'meta' => [
-            ]
+            ],
 
         ]);
     }

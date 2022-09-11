@@ -5,12 +5,11 @@ namespace App\Exceptions;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Throwable;
 use Illuminate\Http\Request;
 use stdClass;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -53,7 +52,6 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
-
 
         $this->renderable(function (NotFoundHttpException $e, Request $request) {
             if ($request->expectsJson()) {

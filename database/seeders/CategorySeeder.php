@@ -26,9 +26,9 @@ class CategorySeeder extends Seeder
         Tag::create(['name' => 'Dev Ops', 'type' => Book::CATEGORY_TYPE_CONCEPT]);
         Tag::create(['name' => 'Ecommerce', 'type' => Book::CATEGORY_TYPE_CONCEPT]);
 
-         // //Available concept
-         Tag::create(['name' => 'Web Development', 'type' => Book::CATEGORY_TYPE_CATEGORY]);
-         Tag::create(['name' => 'Dev Ops', 'type' => Book::CATEGORY_TYPE_CATEGORY]);
-         Tag::create(['name' => 'Ecommerce', 'type' => Book::CATEGORY_TYPE_CATEGORY]);
+        // //Available concept
+        Tag::create(['name' => 'Web Development', 'type' => Book::CATEGORY_TYPE_CATEGORY]);
+        Tag::create(['name' => 'Dev Ops', 'type' => Book::CATEGORY_TYPE_CATEGORY]);
+        Tag::create(['name' => 'Ecommerce', 'type' => Book::CATEGORY_TYPE_CATEGORY]);
     }
 }

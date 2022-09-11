@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Book\BookDetailsResource;
 use App\Http\Resources\Book\BookListingResource as BookBookListingResource;
 use App\Http\Resources\Book\BookListThumbResource;
-use App\Http\Resources\BookListingResource;
 use App\Service\BookService;
 use Illuminate\Http\Request;
 
@@ -37,7 +36,7 @@ class BookController extends Controller
 
         return response()->json([
             'status' => 200,
-            'data'=> ($view == 'list') ? BookBookListingResource::collection($books->items()) 
+            'data' => ($view == 'list') ? BookBookListingResource::collection($books->items())
                 : BookListThumbResource::collection($books->items()),
             'error' => [],
             'message' => __('Book List has been loaded sucessfuly'),
@@ -46,11 +45,10 @@ class BookController extends Controller
                 'currentTotal' => $books->count(),
                 'perPage' => $books->perPage(),
                 'currentPage' => $books->currentPage(),
-                'lastPage' => $books->lastPage()
-            ]
+                'lastPage' => $books->lastPage(),
+            ],
 
         ]);
-
     }
 
     /**
@@ -76,11 +74,11 @@ class BookController extends Controller
 
         return response()->json([
             'status' => 200,
-            'data'=> new BookDetailsResource($book),
+            'data' => new BookDetailsResource($book),
             'error' => [],
             'message' => __('Book List has been loaded sucessfuly'),
             'meta' => [
-            ]
+            ],
         ]);
     }
 

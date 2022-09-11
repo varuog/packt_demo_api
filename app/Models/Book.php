@@ -16,8 +16,8 @@ class Book extends Model
 
     const CATEGORY_TYPE_CATEGORY = 'category';
 
-    protected $guarded= [];
-    
+    protected $guarded = [];
+
     public function authors()
     {
         return $this->belongsToMany(Author::class, 'author_books', 'book_id', 'author_id');

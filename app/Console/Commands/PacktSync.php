@@ -40,14 +40,13 @@ class PacktSync extends Command
     {
         $booksData = $this->packtService->fetchAll();
         // dd($booksData['products']);
-        if(isset($booksData['products']) && is_array($booksData['products'])) {
-            foreach($booksData['products'] as $bookData) {
+        if (isset($booksData['products']) && is_array($booksData['products'])) {
+            foreach ($booksData['products'] as $bookData) {
                 dispatch(new BookSyncJob($bookData));
             }
         } else {
             Log::error('Packt API error');
         }
-        
 
         return 0;
     }

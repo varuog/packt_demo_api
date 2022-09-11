@@ -9,6 +9,5 @@ return [
         'usd', 'gbp', 'inr', 'eur', 'aud',
     ],
     'perPage' => 10,
-    
 
 ];

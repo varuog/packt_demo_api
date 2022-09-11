@@ -22,7 +22,7 @@ class PacktService
      * @param  int  $page default 1
      * @param  int  $limit default 10000
      */
-    public function fetchAll($page=1, $limit=1000)
+    public function fetchAll($page = 1, $limit = 1000)
     {
         $productListApiUrl = sprintf('%s/api/v1/products?', config('services.packt.url'));
         // dd($productListApiUrl);

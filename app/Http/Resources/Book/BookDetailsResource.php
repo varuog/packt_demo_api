@@ -26,7 +26,7 @@ class BookDetailsResource extends JsonResource
             'packt_id' => $this->packt_id,
             'product_type' => $this->product_type,
             'url' => $this->url,
-            'authors' => AuthorDetailsResource::collection($this->authors)
+            'authors' => AuthorDetailsResource::collection($this->authors),
         ];
     }
 }

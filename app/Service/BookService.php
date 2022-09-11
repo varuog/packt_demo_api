@@ -1,35 +1,43 @@
-<?PHP
+<?php
 
 namespace App\Service;
 
 use App\Models\Book;
-use App\Models\Tag;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class BookService
 {
-
     const FILTER_TITLE = 'title';
+
     const FILTER_PRODUCT_TYPE = 'product_type';
+
     const FILTER_PUBLISH_YEAR = 'publish_year';
+
     const FILTER_RELEASE_YEAR = 'release_year';
+
     const FILTER_LANGUAGE = 'language';
+
     const FILTER_CONCEPT = 'concept';
+
     const FILTER_CATEGORY = 'category';
+
     const FILTER_PUBLISH_AUTHOR = 'author';
 
     const SORT_ORDER_DESC = 'DESC';
+
     const SORT_ORDER_ASC = 'ASC';
 
     const SORT_FIELD_PUBLISH_YEAR = 'publish_year';
+
     // const SORT_FIELD_POPULAR = 'popular';
     const SORT_FIELD_RELEASE_YEARE = 'release_year';
 
     protected $httpService;
+
     protected $authorService;
+
     protected $tagService;
 
     public function __construct(AuthorService $authorService, TagService $tagService)
@@ -39,13 +47,13 @@ class BookService
         //dd('ss');
     }
 
-
     /**
      * Fetch book list along with filters and sorting
-     * @param array $filter array key value pait of filters. value can be string or array (for multi selection)   
+     *
+     * @param  array  $filter array key value pait of filters. value can be string or array (for multi selection)
      *            valid value for key static::FILTER_*
-     * @param array $sort array valid key values array static::SORT_FIELD_*  and valid values are 'ASC' and 'DESC    
-     * @param array $perPage null|integer if null all data fetched else per page item will be sent as per param
+     * @param  array  $sort array valid key values array static::SORT_FIELD_*  and valid values are 'ASC' and 'DESC
+     * @param  array  $perPage null|integer if null all data fetched else per page item will be sent as per param
      */
     public function fetchAll(array $filter = [], array $sort = [], $perPage = null)
     {
@@ -96,14 +104,12 @@ class BookService
         //dd($sort);
         foreach ($sort as $sortField => $sortOrder) {
             if (in_array($sortField, [static::SORT_FIELD_PUBLISH_YEAR, static::SORT_FIELD_RELEASE_YEARE])) {
-                
-                if($sortField == static::SORT_FIELD_PUBLISH_YEAR) {
+                if ($sortField == static::SORT_FIELD_PUBLISH_YEAR) {
                     $bookQuery->orderBy('publication_date', $sortOrder);
                 }
-                if($sortField == static::SORT_FIELD_RELEASE_YEARE) {
+                if ($sortField == static::SORT_FIELD_RELEASE_YEARE) {
                     $bookQuery->orderBy('release_year', $sortOrder);
                 }
-                
             }
         }
 
@@ -114,9 +120,9 @@ class BookService
         }
     }
 
-
     /**
      * Used to fetch book details
+     *
      * @param $bookId intenger book Id PK
      * @return Book return book model
      */
@@ -128,9 +134,9 @@ class BookService
         return $bookQuery->first();
     }
 
-
     /**
      * Fetch available filters
+     *
      * @return array filter with filter id, displayname, and available value for the filters
      */
     public function fetchFilters()
@@ -147,7 +153,6 @@ class BookService
             ->groupBy('release_year')
             ->get();
 
-
         $categories = $this->tagService->tagListCountByType(static::FILTER_CATEGORY);
         $languages = $this->tagService->tagListCountByType(static::FILTER_LANGUAGE);
         $concepts = $this->tagService->tagListCountByType(static::FILTER_CONCEPT);
@@ -157,34 +162,34 @@ class BookService
 
         return [
             [
-                'filter' =>  static::FILTER_CATEGORY,
+                'filter' => static::FILTER_CATEGORY,
                 'displayName' => __('Category'),
-                'data' => $categories
+                'data' => $categories,
             ],
             [
-                'filter' =>  static::FILTER_PRODUCT_TYPE,
+                'filter' => static::FILTER_PRODUCT_TYPE,
                 'displayName' => __('Product Type'),
                 'data' => $productTypes,
             ],
             [
-                'filter' =>  static::FILTER_PUBLISH_YEAR,
+                'filter' => static::FILTER_PUBLISH_YEAR,
                 'displayName' => __('Publication Date'),
                 'data' => $publicationDates,
             ],
             [
-                'filter' =>  static::FILTER_RELEASE_YEAR,
+                'filter' => static::FILTER_RELEASE_YEAR,
                 'displayName' => __('Release Year'),
                 'data' => $releaseDates,
             ],
             [
-                'filter' =>  static::FILTER_LANGUAGE,
+                'filter' => static::FILTER_LANGUAGE,
                 'displayName' => __('Language'),
-                'data' => $languages
+                'data' => $languages,
             ],
             [
-                'filter' =>  static::FILTER_CONCEPT,
+                'filter' => static::FILTER_CONCEPT,
                 'displayName' => __('Concept'),
-                'data' => $concepts
+                'data' => $concepts,
             ],
 
         ];
@@ -192,7 +197,8 @@ class BookService
 
     /**
      * Create bulk books
-     * @param array $books array of book data from API
+     *
+     * @param  array  $books array of book data from API
      * @return array Author array of book model
      */
     public function bulkAdd(array $bookData)
@@ -213,7 +219,6 @@ class BookService
                     'release_year' => fake()->date('Y'),
                     'pages' => fake()->numberBetween(50, 500),
                     'url' => fake()->url(),
-
 
                 ],
             );

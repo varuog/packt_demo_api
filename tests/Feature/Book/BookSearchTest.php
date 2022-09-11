@@ -4,7 +4,6 @@ namespace Tests\Feature\Book;
 
 use App\Models\Book;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
@@ -43,10 +42,9 @@ class BookSearchTest extends TestCase
                 'filter[language][]=Java',
                 'filter[category][]=cli',
 
-            ]]
+            ]],
         ];
     }
-
 
     /**
      * @dataProvider noMatchFoundProvider
@@ -68,7 +66,6 @@ class BookSearchTest extends TestCase
                 $book->attachTags(['PHP'], Book::CATEGORY_TYPE_LANGUAGE);
                 $book->attachTags(['Web'], Book::CATEGORY_TYPE_CATEGORY);
             });
-
 
         $queryStr = implode('&', $filterParam);
         $response = $this->getJson(sprintf('/api/book?%s', $queryStr));
@@ -96,9 +93,8 @@ class BookSearchTest extends TestCase
                 $book->attachTags(['Blockchain'], Book::CATEGORY_TYPE_CATEGORY);
             });
 
-
         $queryStr = implode('&', [
-            'filter[category][]=Programming'
+            'filter[category][]=Programming',
         ]);
         // dd($queryStr);
         $response = $this->getJson(sprintf('/api/book?%s', $queryStr));
@@ -112,7 +108,6 @@ class BookSearchTest extends TestCase
                     ->etc();
             });
     }
-
 
     public function test_search_language()
     {
@@ -128,7 +123,7 @@ class BookSearchTest extends TestCase
             });
 
         $queryStr = implode('&', [
-            'filter[language][]=PHP'
+            'filter[language][]=PHP',
         ]);
         $response = $this->getJson(sprintf('/api/book?%s', $queryStr));
 
@@ -156,7 +151,7 @@ class BookSearchTest extends TestCase
             });
 
         $queryStr = implode('&', [
-            'filter[concept][]=Web Development'
+            'filter[concept][]=Web Development',
         ]);
         $response = $this->getJson(sprintf('/api/book?%s', $queryStr));
 
@@ -169,7 +164,6 @@ class BookSearchTest extends TestCase
                     ->etc();
             });
     }
-
 
     public function test_search_publication_date()
     {
@@ -190,7 +184,7 @@ class BookSearchTest extends TestCase
             ->create();
 
         $queryStr = implode('&', [
-            'filter[publish_year][]=2022'
+            'filter[publish_year][]=2022',
         ]);
         $response = $this->getJson(sprintf('/api/book?%s', $queryStr));
 
@@ -203,7 +197,6 @@ class BookSearchTest extends TestCase
                     ->etc();
             });
     }
-
 
     public function test_search_release_date()
     {
@@ -224,7 +217,7 @@ class BookSearchTest extends TestCase
             ->create();
 
         $queryStr = implode('&', [
-            'filter[release_year][]=2022'
+            'filter[release_year][]=2022',
         ]);
         $response = $this->getJson(sprintf('/api/book?%s', $queryStr));
 
@@ -237,7 +230,6 @@ class BookSearchTest extends TestCase
                     ->etc();
             });
     }
-
 
     public function test_search_product_type()
     {
@@ -258,7 +250,7 @@ class BookSearchTest extends TestCase
             ->create();
 
         $queryStr = implode('&', [
-            'filter[product_type][]=ebook'
+            'filter[product_type][]=ebook',
         ]);
         $response = $this->getJson(sprintf('/api/book?%s', $queryStr));
 
